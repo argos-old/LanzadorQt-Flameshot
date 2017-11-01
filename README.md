@@ -34,6 +34,9 @@ python3 instalador.py --desinstalar -v
 ```
 python3 instalador.py --help
 ```
+### Devmode
+Se ha añadido al script de instalación el parámetro --devmode. Cuando empecé con esto estuve buscando documentación sobre cómo crear interfaces gráficas Qt5 con Python. Casi todos los textos que encontré (que por cierto, no fueron muchos) utilizaban la función loadUiType() que personalmente no me agrada mucho. En su lugar se ha utilizado pyuic para compilar la interface de usuario generada con el diseñador en un archivo independiente de la clase que maneja los widgets. Esto puede resultar interesante y muy útil a quien quiera diseñar aplicaciones Qt con Python; por eso se ha incluido. Nota: se necesitará instalar las herramientas de desarrollo de PyQt5. 
+
 ## Errores conocidos:
 Como Flameshot lo incluye, se ha incluido la opción de copiar la captura al portapapeles en el modo "pantalla completa", pero, al menos en mi distribución, esta opción no funciona correctamente. 
 
