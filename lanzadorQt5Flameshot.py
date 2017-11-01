@@ -4,15 +4,15 @@
 import os
 import subprocess
 import sys
-from PyQt5.QtWidgets import QMessageBox
 from configparser import ConfigParser
+
+from PyQt5.QtWidgets import QMessageBox
+
 from lanzadorQt5FlameshotUI import *
 
 # Variables
-rutaArchivoConfig = os.getenv("HOME") + "/.config/Lanzador Flameshot/Lanzador.cfg"
+rutaArchivoConfig = os.getenv("HOME") + "/.config/LanzadorQt5 Flameshot/Lanzador.cfg"
 version = "v.0.1"
-inicio = False
-
 
 if os.path.exists("/usr/local/bin/flameshot"):
     rutaFlameshot = "/usr/local/bin/flameshot"

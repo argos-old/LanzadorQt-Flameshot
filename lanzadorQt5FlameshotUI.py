@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file
+# Form implementation generated from reading ui file '/media/ivan/Acer/Users/ivanr/Proyectos/Python/PyCharmProjects/LanzadorQt5-Flameshot/lanzadorQt5Flameshot.ui'
 #
 # Created by: PyQt5 UI code generator 5.7
 #
