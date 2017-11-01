@@ -1,8 +1,8 @@
-# Lanzador-Flameshot
+# LanzadorQt-Flameshot
 Este script proporciona un diálogo Qt5 en Linux para ejecutar Flameshot. El script permite "recordar" la ruta de guardado y el tiempo de demora
 
 ## Importante
-Para mí este "proyecto" es un segundo contacto con Python que no pretende ser más que un experimento con este lenguaje y el framework Qt5.
+Para mí este "proyecto" es un primer contacto con Python3 que no pretende ser más que un experimento con este lenguaje y el framework Qt5.
 
 ### Requisitos previos:
 - Tener instalado Python 3
