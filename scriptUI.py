@@ -1,17 +1,24 @@
 #!/usr/bin/python3
 
-import os
-import subprocess
 
-rutaUi = os.getcwd() + "/lanzadorQt5Flameshot.ui"
-rutaOut = os.getcwd() + "/lanzadorQt5FlameshotUI.py"
+class CompilaUI:
+    def __init__(self, entrada, salida):
+        self.entrada = entrada
+        self.salida = salida
 
-argui = list()
-argui.insert(0, "pyuic5")
-argui.insert(1, rutaUi)
-argui.append("-o")
-argui.append(rutaOut)
+    def ejecuta(self):
+        import subprocess
 
-proceso = subprocess.run(argui, stdout=subprocess.PIPE)
-print(proceso)
+        argui = list()
+        argui.insert(0, "pyuic5")
+        argui.insert(1, self.entrada)
+        argui.append("-o")
+        argui.append(self.salida)
+
+        proceso = subprocess.run(argui, stdout=subprocess.PIPE)
+
+        return proceso
+
+
+
 

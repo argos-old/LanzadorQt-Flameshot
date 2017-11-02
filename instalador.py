@@ -5,7 +5,7 @@
 #   Script de instalación Lanzador Qt5 Flameshot.py v 0.1   #
 #############################################################
 #                                                           #
-# Uso 1:             python3 instalacion --help             #
+# Uso 1:             python3 instalacion.py --help          #
 #                                                           #
 # Uso 2:             sudo chmod +x instalacion.py           #
 #                    ./instalacion.py --help                #
@@ -20,6 +20,8 @@ import os
 import shutil
 from configparser import ConfigParser
 
+import scriptUI
+
 version = "v.0.1"
 titulo = "Instalación Lanzador Qt5 de Flameshot"
 
@@ -28,54 +30,50 @@ print(titulo + version.rjust(60 - len(titulo), " "))
 print("".ljust(60, "="))
 
 
-def checkPreguntaSiNo(pregunta):
+def check_pregunta_si_no(pregunta):
+
     rpt = input(pregunta).lower()
-    if rpt == "s" or rpt == "si" or rpt == "sí" or rpt == "y" or rpt == "yes":
+
+    if rpt in ("s", "si", "sí", "y", "yes"):
         return "si"
-    elif rpt.lower() == "n" or rpt == "no":
+    elif rpt in ("n", "no"):
         return "no"
     elif rpt == "":
-        return ""
-    else:
-        print("- Respuesta no válida.")
         return rpt
+    else:
+        print("-", "Respuesta no válida.")
+        return None
 
 
 class Instalacion:
     def __init__(self):
 
         home = os.getenv("HOME")
-        rutaScript = home + "/.local/share/LanzadorQt5Flameshot/script/"
-        rutaLDesktop = home + "/.local/share/applications/lanzador-flameshot.desktop"
+        ruta_script = home + "/.local/share/LanzadorQt5Flameshot/script/"
+        ruta_l_desktop = home + "/.local/share/applications/lanzador-flameshot.desktop"
         ok = True
 
-        #try:
-        if 1 < 2:
+        try:
             if args.devmode:
                 print("-", args)
                 if args.desinstalar:
                     print("-", "Devmode sólo está disponible durante la instalación")
                     exit()
 
-                import subprocess
+                entrada = os.getcwd() + "/lanzadorQt5Flameshot.ui"
+                salida = os.getcwd() + "/lanzadorQt5FlameshotUI.py"
 
-                rutaUi = os.getcwd() + "/lanzadorQt5Flameshot.ui"
-                rutaOut = os.getcwd() + "/lanzadorQt5FlameshotUI.py"
-
-                argui = list()
-                argui.insert(0, "pyuic5")
-                argui.insert(1, rutaUi)
-                argui.append("-o")
-                argui.append(rutaOut)
-
-                proceso = subprocess.run(argui, stdout=subprocess.PIPE)
-                print("-", proceso)
+                compilaui = scriptUI.CompilaUI(entrada, salida)
+                proceso_finalizado = compilaui.ejecuta()
+                print("-", "args ......:", proceso_finalizado.args)
+                print("-", "stdout ....:", proceso_finalizado.stdout.decode("utf8"))
+                print("-", "returncode :", proceso_finalizado.returncode)
 
             if not args.desinstalar:
-                if not os.path.exists(rutaScript):
-                    os.makedirs(rutaScript)
-                if not os.path.exists(rutaScript + "lanzadorQt5.py"):
-                    shutil.copy(os.getcwd() + "/lanzadorQt5Flameshot.py", rutaScript + "lanzadorQt5.py")
+                if not os.path.exists(ruta_script):
+                    os.makedirs(ruta_script)
+                if not os.path.exists(ruta_script + "lanzadorQt5.py"):
+                    shutil.copy(os.getcwd() + "/lanzadorQt5Flameshot.py", ruta_script + "lanzadorQt5.py")
                     if args.verbose:
                         print("-", "Script copiado")
 
@@ -83,8 +81,8 @@ class Instalacion:
                     if args.verbose:
                         print("-", "El script ya existía")
 
-                if not os.path.exists(rutaScript + "lanzadorQt5FlameshotUI.py"):
-                    shutil.copy(os.getcwd() + "/lanzadorQt5FlameshotUI.py", rutaScript + "lanzadorQt5FlameshotUI.py")
+                if not os.path.exists(ruta_script + "lanzadorQt5FlameshotUI.py"):
+                    shutil.copy(os.getcwd() + "/lanzadorQt5FlameshotUI.py", ruta_script + "lanzadorQt5FlameshotUI.py")
                     if args.verbose:
                         print("-", "Interface de usuario Qt5 copiada")
 
@@ -92,7 +90,7 @@ class Instalacion:
                     if args.verbose:
                         print("-", "La interfaz Qt5 ya existía")
 
-                if not os.path.exists(rutaLDesktop):
+                if not os.path.exists(ruta_l_desktop):
 
                     interprete = input("- ¿Qué intérprete utilizar? [/usr/bin/python3] : ")
 
@@ -102,7 +100,7 @@ class Instalacion:
                     if not os.path.exists(interprete):
                         err = True
                         while err:
-                            ine = checkPreguntaSiNo("- " + interprete + " no existe, ¿desea continuar? s / [n] : ")
+                            ine = check_pregunta_si_no("- " + interprete + " no existe, ¿desea continuar? s / [n] : ")
 
                             if ine == "no" or ine == "":
                                 print("-", "Operación abortada. Se procede a la desinstalación")
@@ -122,12 +120,12 @@ class Instalacion:
                     config.set("Desktop Entry", "Encoding", "UTF-8")
                     config.set("Desktop Entry", "Name", "Lanzador Qt5 Flameshot")
                     config.set("Desktop Entry", "Comment", "Simple y potente software de captura de pantalla")
-                    config.set("Desktop Entry", "Exec", interprete + " " + rutaScript + "lanzadorQt5.py")
+                    config.set("Desktop Entry", "Exec", interprete + " " + ruta_script + "lanzadorQt5.py")
                     config.set("Desktop Entry", "Icon", "/usr/local/share/icons/flameshot.png")
                     config.set("Desktop Entry", "Type", "Application")
                     config.set("Desktop Entry", "Categories", "Graphics;Utility;")
 
-                    with open(rutaLDesktop, "w") as archivoConfig:
+                    with open(ruta_l_desktop, "w") as archivoConfig:
                         config.write(archivoConfig)
                     if args.verbose:
                         print("-", "Lanzador creado")
@@ -141,10 +139,10 @@ class Instalacion:
                     trp1 = "- Se eliminó "
                     trp2 = "- No se encontró "
 
-                rutaConfig = os.getenv("HOME") + "/.config/LanzadorQt5 Flameshot/Lanzador.cfg"
+                ruta_config = os.getenv("HOME") + "/.config/LanzadorQt5 Flameshot/Lanzador.cfg"
 
-                if os.path.exists(rutaScript + "lanzadorQt5.py") or os.path.exists(rutaScript + "lanzadorQT5UI.py"):
-                    shutil.rmtree(rutaScript.replace("script/", ""))
+                if os.path.exists(ruta_script + "lanzadorQt5.py") or os.path.exists(ruta_script + "lanzadorQT5UI.py"):
+                    shutil.rmtree(ruta_script.replace("script/", ""))
                     if args.verbose:
                         print(trp1 + "el script")
                         print(trp1 + "la interface Qt5")
@@ -154,8 +152,8 @@ class Instalacion:
                         print(trp2 + "el script")
                         print(trp2 + "la interface Qt5")
 
-                if os.path.exists(rutaLDesktop):
-                    os.remove(rutaLDesktop)
+                if os.path.exists(ruta_l_desktop):
+                    os.remove(ruta_l_desktop)
                     if args.verbose:
                         print(trp1 + "el lanzador")
 
@@ -163,13 +161,13 @@ class Instalacion:
                     if args.verbose:
                         print(trp2 + "el lanzador")
 
-                if os.path.exists(rutaConfig):
+                if os.path.exists(ruta_config):
                     err = True
                     while err:
-                        eac = checkPreguntaSiNo("- ¿Eliminar el archivo de configuración? s / [n] : ")
+                        eac = check_pregunta_si_no("- ¿Eliminar el archivo de configuración? s / [n] : ")
 
                         if eac == "si":
-                            shutil.rmtree(rutaConfig.replace("Lanzador.cfg", ""))
+                            shutil.rmtree(ruta_config.replace("Lanzador.cfg", ""))
                             if args.verbose:
                                 print("-", "Se eliminó el archivo de configuración")
                             err = None
@@ -178,7 +176,7 @@ class Instalacion:
                                 print("-", "No se eliminó el archivo de configuración")
                             err = None
 
-        '''except IOError as ex:
+        except IOError as ex:
             print("!", "Error I/O ({0}) : {1}".format(ex.errno, ex.strerror))
             ok &= False
 
@@ -204,8 +202,7 @@ class Instalacion:
 
             print("".ljust(60, "="))
 
-            exit()'''
-
+            exit()
 
 # Final de clase Instalacion
 
@@ -226,7 +223,7 @@ if __name__ == "__main__":
         if not os.path.exists("/usr/local/bin/flameshot") and not os.path.exists("/usr/bin/flameshot"):
             err = True
             while err:
-                res = checkPreguntaSiNo("- Parece que Flameshot no está instalado.\n¿Desea continuar? [s] / n :")
+                res = check_pregunta_si_no("- Parece que Flameshot no está instalado.\n¿Desea continuar? [s] / n :")
                 if res == "si" or res == "":
                     err = None
                     Instalacion()

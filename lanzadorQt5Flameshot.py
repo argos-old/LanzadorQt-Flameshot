@@ -5,9 +5,7 @@ import os
 import subprocess
 import sys
 from configparser import ConfigParser
-
 from PyQt5.QtWidgets import QMessageBox
-
 from lanzadorQt5FlameshotUI import *
 
 # Variables
@@ -38,29 +36,18 @@ class Lanzador(QtWidgets.QMainWindow):
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(rutaIcono))
         self.setWindowIcon(icon)
+        self.setFixedSize(self.width(), self.height())
 
         # Declaración eventos
-        self.ui.checkBoxCopiarAlPortapapeles.stateChanged.connect(self.OnCheckBoxCopiarPPChanged)
-        self.ui.comboBoxArea.currentIndexChanged.connect(self.OnComboBoxAreaClick)
-        self.ui.spinBoxSegundos.valueChanged.connect(self.OnSpinCtrlSegundosClick)
-        self.ui.lineEditRutaGuardado.textChanged.connect(self.OnTextCtrlRutaGuardadoClick)
-        self.ui.toolButtonDirDialog.clicked.connect(self.OnButtonClickDialogClick)
-        self.ui.pushButtonCaptura.clicked.connect(self.OnButtonRealizarCapturaClick)
-        self.ui.pushButtonPreferencias.clicked.connect(self.OnButtonPreferenciasClick)
+        self.ui.checkBoxCopiarAlPortapapeles.stateChanged.connect(self.checkbox_copiar_pp_changed)
+        self.ui.comboBoxArea.currentIndexChanged.connect(self.combobox_area_click)
+        self.ui.spinBoxSegundos.valueChanged.connect(self.spinctrl_segundos_click)
+        self.ui.lineEditRutaGuardado.textChanged.connect(self.line_edit_ruta_guardado_click)
+        self.ui.toolButtonDirDialog.clicked.connect(self.toolbutton_dir_dialog_click)
+        self.ui.pushButtonCaptura.clicked.connect(self.pushbutton_realizar_captura_click)
+        self.ui.pushButtonPreferencias.clicked.connect(self.pushbutton_preferencias_click)
 
-        self.setConfig()
-
-    def OnCheckBoxCopiarPPChanged(self):
-
-        check = self.ui.checkBoxCopiarAlPortapapeles.isChecked()
-        config.set("Configuracion", "copia_clipboard", str(check))
-
-    def OnComboBoxAreaClick(self):
-
-        indice = self.ui.comboBoxArea.currentIndex()
-
-        self.ui.checkBoxCopiarAlPortapapeles.setEnabled(not indice)
-        config.set("Configuracion", "indice_combo", str(indice))
+        self.set_config()
 
     def closeEvent(self, a0: QtGui.QCloseEvent):
 
@@ -73,21 +60,33 @@ class Lanzador(QtWidgets.QMainWindow):
             err = ""
             for mj in sys.exc_info():
                 err += "! " + str(mj) + "\n"
-            self.msgDlg("Se produjo un error inesperado:", excepcion.args[1], QMessageBox.Ok,
-                        QMessageBox.Warning, err)
+            self.msg_dlg("Se produjo un error inesperado:", excepcion.args[1], QMessageBox.Ok,
+                         QMessageBox.Warning, err)
 
         finally:
             aplicacion.close()
 
-    def OnSpinCtrlSegundosClick(self):
+    def checkbox_copiar_pp_changed(self):
+
+        check = self.ui.checkBoxCopiarAlPortapapeles.isChecked()
+        config.set("Configuracion", "copia_clipboard", str(check))
+
+    def combobox_area_click(self):
+
+        indice = self.ui.comboBoxArea.currentIndex()
+
+        self.ui.checkBoxCopiarAlPortapapeles.setEnabled(not indice)
+        config.set("Configuracion", "indice_combo", str(indice))
+
+    def spinctrl_segundos_click(self):
 
         config.set("Configuracion", "retardo", str(self.ui.spinBoxSegundos.value()))
 
-    def OnTextCtrlRutaGuardadoClick(self):
+    def line_edit_ruta_guardado_click(self):
 
         config.set("Configuracion", "ruta_guardado", self.ui.lineEditRutaGuardado.text())
 
-    def OnButtonClickDialogClick(self):
+    def toolbutton_dir_dialog_click(self):
 
         from PyQt5.QtWidgets import QFileDialog
 
@@ -96,12 +95,13 @@ class Lanzador(QtWidgets.QMainWindow):
         self.ui.lineEditRutaGuardado.setText(directorio)
         config.set("Configuracion", "ruta_guardado", directorio)
 
-    def OnButtonRealizarCapturaClick(self):
+    def pushbutton_realizar_captura_click(self):
 
         ok = False
 
         try:
-            if self.checkFlameshot() == QMessageBox.No: return  # Otras posibilidades: None o QMessagebox.Yes
+            if self.check_flameshot() == QMessageBox.No:
+                return  # Otras posibilidades: None o QMessagebox.Yes
 
             import re
 
@@ -112,17 +112,17 @@ class Lanzador(QtWidgets.QMainWindow):
                     os.makedirs(ruta)
 
                 else:
-                    self.msgDlg(ruta, "no es un nombre de directorio válido", QMessageBox.Ok, QMessageBox.Warning)
+                    self.msg_dlg(ruta, "no es un nombre de directorio válido", QMessageBox.Ok, QMessageBox.Warning)
                     ok = False
                     return
 
-            proceso = subprocess.run(self.setArgumentos(), stdout=subprocess.PIPE)
+            proceso = subprocess.run(self.set_argumentos(), stdout=subprocess.PIPE)
             salida = proceso.stdout.decode("utf8")
 
             if salida != "":
-                self.msgDlg("Se produjo un error inesperado al lanzar Flameshot", "", QMessageBox.Ok,
-                            QMessageBox.Critical,
-                            salida.replace(" See 'flameshot --help'.", ""))
+                self.msg_dlg("Se produjo un error inesperado al lanzar Flameshot", "", QMessageBox.Ok,
+                             QMessageBox.Critical,
+                             salida.replace(" See 'flameshot --help'.", ""))
                 ok = False
 
             else:
@@ -137,17 +137,18 @@ class Lanzador(QtWidgets.QMainWindow):
             for mj in sys.exc_info():
                 err += "! " + str(mj) + "\n"
 
-            self.msgDlg("Se produjo un error durante la operación", excepcion.args[1], QMessageBox.Ok,
-                        QMessageBox.Warning, err)
+            self.msg_dlg("Se produjo un error durante la operación", excepcion.args[1], QMessageBox.Ok,
+                         QMessageBox.Warning, err)
         finally:
             if ok:
                 self.close()
 
-    def OnButtonPreferenciasClick(self):
+    @staticmethod
+    def pushbutton_preferencias_click():
 
         subprocess.run([rutaFlameshot, "config"])
 
-    def setConfig(self):
+    def set_config(self):
 
         if os.path.exists(rutaArchivoConfig):
             config.read(rutaArchivoConfig)
@@ -171,7 +172,7 @@ class Lanzador(QtWidgets.QMainWindow):
             with open(rutaArchivoConfig, "w") as archivoConfig:  # w: sobrescritura: si no existe crea. b: binario
                 config.write(archivoConfig)
 
-    def setArgumentos(self):
+    def set_argumentos(self):
 
         argumentos = list()
         argumentos.append(rutaFlameshot)
@@ -193,28 +194,30 @@ class Lanzador(QtWidgets.QMainWindow):
 
         return argumentos
 
-    def checkFlameshot(self):
+    def check_flameshot(self):
 
         ruta1 = "/usr/local/bin/flameshot"
         ruta2 = "/usr/bin/flameshot"
 
         if not os.path.exists(ruta1) and not os.path.exists(ruta2):
-            return self.msgDlg("Parece que Flameshot no está instalado.", "¿Desea continuar?",
-                               QMessageBox.Yes | QMessageBox.No, QMessageBox.Question,
-                               "Archivo no encontrado en:\n- " + ruta1 + "\n- " + ruta2)
+            return self.msg_dlg("Parece que Flameshot no está instalado.", "¿Desea continuar?",
+                                QMessageBox.Yes | QMessageBox.No, QMessageBox.Question,
+                                "Archivo no encontrado en:\n- " + ruta1 + "\n- " + ruta2)
 
-    def msgDlg(self, txtCuerpo, txtAdicional="", botones=QMessageBox.Ok, icono=QMessageBox.Information, txtDetalles=""):
+    @staticmethod
+    def msg_dlg(txt_cuerpo, txt_adicional="", botones=QMessageBox.Ok, icono=QMessageBox.Information,
+                txt_detalles=""):
 
         msg = QMessageBox()
 
         msg.setIcon(icono)
-        msg.setText(txtCuerpo)
-        msg.setInformativeText(txtAdicional)
+        msg.setText(txt_cuerpo)
+        msg.setInformativeText(txt_adicional)
         msg.setWindowTitle("Flameshot " + version)
         msg.setStandardButtons(botones)
 
-        if txtDetalles != "":
-            msg.setDetailedText(txtDetalles)
+        if txt_detalles != "":
+            msg.setDetailedText(txt_detalles)
 
         return msg.exec()
 

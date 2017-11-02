@@ -1,0 +1,8 @@
+#ignores
+.git/
+.idea/
+__pycache__/
+/.directory
+/..gitinore.kate.swp
+/Notas.txt
+/pruebas.py
