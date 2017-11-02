@@ -175,6 +175,10 @@ class Instalacion:
                             if args.verbose:
                                 print("-", "No se eliminó el archivo de configuración")
                             err = None
+                            
+                else:
+                    if args.verbose:
+                        print("-", "No se encontró el archivo de configuración")
 
         except IOError as ex:
             print("!", "Error I/O ({0}) : {1}".format(ex.errno, ex.strerror))
