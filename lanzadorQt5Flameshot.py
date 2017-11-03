@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import QMessageBox
 from lanzadorQt5FlameshotUI import *
 
 # Variables
-rutaArchivoConfig = os.getenv("HOME") + "/.config/LanzadorQt5 Flameshot/Lanzador.cfg"
+home = os.getenv("HOME")
+rutaArchivoConfig = home + "/.config/LanzadorQt5 Flameshot/Lanzador.cfg"
 version = "v.0.1"
 
 if os.path.exists("/usr/local/bin/flameshot"):
@@ -21,6 +22,8 @@ if os.path.exists("/usr/local/share/icons/flameshot.png"):
     rutaIcono = "/usr/local/share/icons/flameshot.png"
 elif os.path.exists("/usr/share/icons/flameshot.png"):
     rutaIcono = "/usr/share/icons/flameshot.png"
+else:
+    rutaIcono = None
 
 # Clases
 config = ConfigParser()
@@ -33,10 +36,13 @@ class Lanzador(QtWidgets.QMainWindow):
         QtWidgets.QWidget.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(rutaIcono))
-        self.setWindowIcon(icon)
         self.setFixedSize(self.width(), self.height())
+        self.ui.lineEditRutaGuardado.setText(home)
+
+        if rutaIcono is not None:
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(rutaIcono))
+            self.setWindowIcon(icon)
 
         # Declaración eventos
         self.ui.checkBoxCopiarAlPortapapeles.stateChanged.connect(self.checkbox_copiar_pp_changed)
@@ -84,13 +90,17 @@ class Lanzador(QtWidgets.QMainWindow):
 
     def line_edit_ruta_guardado_click(self):
 
+        if self.ui.lineEditRutaGuardado.text() == "":
+            self.ui.lineEditRutaGuardado.setText(home)
+
         config.set("Configuracion", "ruta_guardado", self.ui.lineEditRutaGuardado.text())
 
     def toolbutton_dir_dialog_click(self):
 
         from PyQt5.QtWidgets import QFileDialog
 
-        directorio = str(QFileDialog.getExistingDirectory(self, "Seleccione un directorio", os.getenv("HOME")))
+        dirini = self.ui.lineEditRutaGuardado.text() if os.path.exists(self.ui.lineEditRutaGuardado.text()) else home
+        directorio = str(QFileDialog.getExistingDirectory(self, "Seleccione un directorio", dirini))
 
         self.ui.lineEditRutaGuardado.setText(directorio)
         config.set("Configuracion", "ruta_guardado", directorio)
@@ -166,7 +176,7 @@ class Lanzador(QtWidgets.QMainWindow):
             config.add_section("Configuracion")
             config.set("Configuracion", "indice_combo", "0")
             config.set("Configuracion", "retardo", "0")
-            config.set("Configuracion", "ruta_guardado", os.getenv("HOME"))
+            config.set("Configuracion", "ruta_guardado", home)
             config.set("Configuracion", "copia_clipboard", "False")  # Sin implementar (modo full)
 
             with open(rutaArchivoConfig, "w") as archivoConfig:  # w: sobrescritura: si no existe crea. b: binario
