@@ -40,5 +40,7 @@ Se ha añadido al script de instalación el parámetro --devmode. Cuando empecé
 ## Errores conocidos:
 Como Flameshot lo incluye, se ha incluido la opción de copiar la captura al portapapeles en el modo "pantalla completa", pero, al menos en mi distribución, esta opción no funciona correctamente. 
 
+Diferencias entre lo mostrado en un DE basado en Qt y otro basado en GTK (posiblemente por el uso de budgies Qt5)
+
 
 
